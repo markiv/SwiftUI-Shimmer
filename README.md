@@ -15,6 +15,7 @@ Text("SwiftUI Shimmer").shimmering()
 ![Dark Mode](dark.gif)
 
 ## Optional Parameters ⚙️
+
 - `active`: Convenience parameter to conditionally enable the effect. Defaults to `true`.
 - `duration`: The duration of a shimmer cycle in seconds. Default: `1.5`.
 - `bounce`: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
@@ -29,11 +30,12 @@ Of course, you can combine `.shimmering(...)` with the `.redacted(...)` modifier
 
 ```swift
 Text("Some text")
-	.redacted(reason: .placeholder)
-	.shimmering()
+    .redacted(reason: .placeholder)
+    .shimmering()
 ```
 
 ## Installation 
+
 SwiftUI-Shimmer can be installed using Swift Package Manager.
 
 Use the package URL to search for the URLImage package: [https://github.com/markiv/SwiftUI-Shimmer](https://github.com/markiv/SwiftUI-Shimmer).
@@ -41,4 +43,5 @@ Use the package URL to search for the URLImage package: [https://github.com/mark
 For how-to integrate package dependencies refer to [Adding Package Dependencies to Your App documentation](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
 
 ## What About UIKit?
+
 For an older, UIKit-based shimmer effect, see [UIView-Shimmer](https://github.com/markiv/UIView-Shimmer).

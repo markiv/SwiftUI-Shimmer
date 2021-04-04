@@ -3,6 +3,10 @@
 `Shimmer` is a super-light modifier that adds a shimmering effect to any SwiftUI `View`, for example, to show that an operation is in progress. It works well on light and dark modes, and across iOS, macOS, tvOS and watchOS.
 
 ```swift
+import SwiftUI
+import Shimmer
+:
+:
 Text("SwiftUI Shimmer").modifier(Shimmer())
 ```
 or more conveniently

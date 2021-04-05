@@ -63,10 +63,18 @@ public extension View {
     ///   - duration: The duration of a shimmer cycle in seconds. Default: `1.5`.
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
     @ViewBuilder func shimmering(
-        active: Bool = true, duration: Double = 1.5, bounce: Bool = false
+        active: Bool = true,
+        duration: Double = 1.5,
+        bounce: Bool = false,
+        redact: Bool = false
     ) -> some View {
         if active {
-            modifier(Shimmer(duration: duration, bounce: bounce))
+            if redact, #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+                modifier(Shimmer(duration: duration, bounce: bounce))
+                    .redacted(reason: .placeholder)
+            } else {
+                modifier(Shimmer(duration: duration, bounce: bounce))
+            }
         } else {
             self
         }

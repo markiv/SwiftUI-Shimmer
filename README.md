@@ -18,7 +18,7 @@ Text("SwiftUI Shimmer").shimmering()
 ![Light Mode](light.gif)
 ![Dark Mode](dark.gif)
 
-## Optional Parameters ⚙️
+## Optional Parameters 🔧🪛
 
 - `active`: Convenience parameter to conditionally enable the effect. Defaults to `true`.
 - `duration`: The duration of a shimmer cycle in seconds. Default: `1.5`.
@@ -28,7 +28,7 @@ Text("SwiftUI Shimmer").shimmering()
 
 ## Animated Skeletons ☠️
 
-Of course, you can combine `.shimmering(...)` with the `.redacted(...)` modifier to create interesting animated skeleton views.
+Of course, you can combine `.shimmering(...)` with the `.redacted(...)` modifier to easily create interesting animated skeleton views.
 
 ![Loading](loading.gif)
 

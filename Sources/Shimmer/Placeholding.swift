@@ -151,6 +151,7 @@ public extension ForEach where Content: View, Data.Element: Placeholding {
 #if DEBUG
 /// Example of a `List` that displays animated "skeletons" while loading data.
 /// Start a **Live Preview** to see it in action.
+@available(watchOS, unavailable)
 struct Placeholding_Previews: PreviewProvider {
     static var previews: some View {
         LocaleDemo()

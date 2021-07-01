@@ -15,8 +15,8 @@ or more conveniently
 Text("SwiftUI Shimmer").shimmering()
 ```
 
-![Light Mode](light.gif)
-![Dark Mode](dark.gif)
+![Light Mode](imgs/light.gif)
+![Dark Mode](imgs/dark.gif)
 
 ## Optional Parameters ⚙️
 
@@ -24,13 +24,13 @@ Text("SwiftUI Shimmer").shimmering()
 - `duration`: The duration of a shimmer cycle in seconds. Default: `1.5`.
 - `bounce`: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
 
-![Bounce 3](bounce3.gif)
+![Bounce 3](imgs/bounce3.gif)
 
 ## Animated Skeletons ☠️
 
 Of course, you can combine `.shimmering(...)` with the `.redacted(...)` modifier to create interesting animated skeleton views.
 
-![Loading](loading.gif)
+![Loading](imgs/loading.gif)
 
 ```swift
 Text("Some text")

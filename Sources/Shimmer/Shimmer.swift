@@ -10,13 +10,15 @@ import SwiftUI
 /// an operation is in progress.
 public struct Shimmer: ViewModifier {
     @State private var phase: CGFloat = 0
-    var duration = 1.5
-    var bounce = false
+    var duration: Double = 1.5
+    var delay: Double = 0
+    var bounce: Bool = false
 
     public func body(content: Content) -> some View {
         content
             .modifier(AnimatedMask(phase: phase).animation(
                 Animation.linear(duration: duration)
+                    .delay(delay)
                     .repeatForever(autoreverses: bounce)
             ))
             .onAppear { phase = 0.8 }
@@ -63,10 +65,10 @@ public extension View {
     ///   - duration: The duration of a shimmer cycle in seconds. Default: `1.5`.
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
     @ViewBuilder func shimmering(
-        active: Bool = true, duration: Double = 1.5, bounce: Bool = false
+        active: Bool = true, duration: Double = 1.5, delay: Double = 0, bounce: Bool = false
     ) -> some View {
         if active {
-            modifier(Shimmer(duration: duration, bounce: bounce))
+            modifier(Shimmer(duration: duration, delay: delay, bounce: bounce))
         } else {
             self
         }

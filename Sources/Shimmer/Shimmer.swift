@@ -6,16 +6,29 @@
 
 import SwiftUI
 
+//let centerColor = Color.white.opacity(0.3)
+//let edgeColor = Color.white.opacity(1)
+
 /// A view modifier that applies an animated "shimmer" to any view, typically to show that
 /// an operation is in progress.
 public struct Shimmer: ViewModifier {
+    
     @State private var phase: CGFloat = 0
-    var duration = 1.5
-    var bounce = false
+    var duration: Double
+    var bounce: Bool
+    
+    let invertedMask: Bool
+    
+    public init(duration: Double = 1.5, bounce: Bool = false, invertedMask: Bool = false) {
+        
+        self.duration = duration
+        self.bounce = bounce
+        self.invertedMask = invertedMask
+    }
 
     public func body(content: Content) -> some View {
         content
-            .modifier(AnimatedMask(phase: phase).animation(
+            .modifier(AnimatedMask(phase: phase, invertedMask: invertedMask).animation(
                 Animation.linear(duration: duration)
                     .repeatForever(autoreverses: bounce)
             ))
@@ -25,6 +38,12 @@ public struct Shimmer: ViewModifier {
     /// An animatable modifier to interpolate between `phase` values.
     struct AnimatedMask: AnimatableModifier {
         var phase: CGFloat = 0
+        var invertedMask: Bool = false
+        
+        internal init(phase: CGFloat, invertedMask: Bool = false) {
+            self.phase = phase
+            self.invertedMask = invertedMask
+        }
 
         var animatableData: CGFloat {
             get { phase }
@@ -32,18 +51,31 @@ public struct Shimmer: ViewModifier {
         }
 
         func body(content: Content) -> some View {
-            content
-                .mask(GradientMask(phase: phase).scaleEffect(3))
+            
+            if !invertedMask {
+                
+                content.mask(GradientMask.shimmerGradientMask(phase).scaleEffect(3))
+            } else {
+                
+                content.mask(GradientMask.invertShimmerGradientMask(phase).scaleEffect(3))
+            }
         }
     }
 
     /// A slanted, animatable gradient between transparent and opaque to use as mask.
     /// The `phase` parameter shifts the gradient, moving the opaque band.
     struct GradientMask: View {
+        
         let phase: CGFloat
-        let centerColor = Color.black
-        let edgeColor = Color.black.opacity(0.3)
-
+        let centerColor: Color
+        let edgeColor: Color
+        
+        internal init(phase: CGFloat, centerColor: Color = .black, edgeColor: Color = .black.opacity(0.3)) {
+            self.phase = phase
+            self.centerColor = centerColor
+            self.edgeColor = edgeColor
+        }
+        
         var body: some View {
             LinearGradient(gradient:
                 Gradient(stops: [
@@ -63,14 +95,32 @@ public extension View {
     ///   - duration: The duration of a shimmer cycle in seconds. Default: `1.5`.
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
     @ViewBuilder func shimmering(
-        active: Bool = true, duration: Double = 1.5, bounce: Bool = false
+        active: Bool = true, duration: Double = 1.5, bounce: Bool = false, invertedMask: Bool = false
     ) -> some View {
         if active {
-            modifier(Shimmer(duration: duration, bounce: bounce))
+            modifier(Shimmer(duration: duration, bounce: bounce, invertedMask: invertedMask))
         } else {
             self
         }
     }
+}
+
+extension Shimmer.GradientMask {
+    
+    static func shimmerGradientMask(_ phase: CGFloat) -> Shimmer.GradientMask {
+        
+        Shimmer.GradientMask(phase: phase)
+    }
+    
+    static func invertShimmerGradientMask(_ phase: CGFloat) -> Shimmer.GradientMask {
+        
+        Shimmer.GradientMask(phase: phase, centerColor: .white.opacity(0.3), edgeColor: .white.opacity(1))
+    }
+}
+
+extension Shimmer.AnimatedMask {
+    
+    
 }
 
 #if DEBUG

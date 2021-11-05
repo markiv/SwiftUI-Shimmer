@@ -111,9 +111,9 @@ public extension View {
     ///   - duration: The duration of a shimmer cycle in seconds. Default: `1.5`.
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
     @ViewBuilder func shimmering(
-        active: Bool = true, movement: Shimmer.AnimationMovement = .constantDuration(1.5), bounces: Bool = false, invertedMask: Bool = false, repeats: Bool = true) -> some View {
+        active: Bool = true, movement: Shimmer.AnimationMovement = .constantDuration(1.5), delay: Double = 0, bounces: Bool = false, invertedMask: Bool = false, repeats: Bool = true) -> some View {
         if active {
-            modifier(Shimmer(movement: movement, bounces: bounces, invertedMask: invertedMask, repeats: repeats))
+            modifier(Shimmer(movement: movement, delay: delay, bounces: bounces, invertedMask: invertedMask, repeats: repeats))
         } else {
             self
         }

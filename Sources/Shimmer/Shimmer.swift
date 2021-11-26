@@ -29,7 +29,7 @@ public struct Shimmer: ViewModifier {
         self.invertedMask = invertedMask
         self.repeats = repeats
     }
-
+    
     public func body(content: Content) -> some View {
         Group {
             
@@ -50,7 +50,7 @@ public struct Shimmer: ViewModifier {
             contentSize = prefs.first?.size ?? .zero
         })
     }
-
+    
     /// An animatable modifier to interpolate between `phase` values.
     struct AnimatedMask: AnimatableModifier {
         var phase: CGFloat = 0
@@ -60,16 +60,16 @@ public struct Shimmer: ViewModifier {
             self.phase = phase
             self.invertedMask = invertedMask
         }
-
+        
         var animatableData: CGFloat {
             get { phase }
             set { phase = newValue }
         }
-
+        
         func body(content: Content) -> some View {
             
             if !invertedMask {
-
+                
                 content.mask(GradientMask.shimmerGradientMask(phase).scaleEffect(2))
             } else {
                 
@@ -77,7 +77,7 @@ public struct Shimmer: ViewModifier {
             }
         }
     }
-
+    
     /// A slanted, animatable gradient between transparent and opaque to use as mask.
     /// The `phase` parameter shifts the gradient, moving the opaque band.
     struct GradientMask: View {
@@ -94,11 +94,11 @@ public struct Shimmer: ViewModifier {
         
         var body: some View {
             LinearGradient(gradient:
-                Gradient(stops: [
-                    .init(color: edgeColor, location: phase),
-                    .init(color: centerColor, location: phase + 0.15),
-                    .init(color: edgeColor, location: phase + 0.3)
-                ]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                            Gradient(stops: [
+                                .init(color: edgeColor, location: phase),
+                                .init(color: centerColor, location: phase + 0.15),
+                                .init(color: edgeColor, location: phase + 0.3)
+                            ]), startPoint: .topLeading, endPoint: .bottomTrailing)
         }
     }
 }
@@ -112,12 +112,12 @@ public extension View {
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
     @ViewBuilder func shimmering(
         active: Bool = true, movement: Shimmer.AnimationMovement = .constantDuration(1.5), delay: Double = 0, bounces: Bool = false, invertedMask: Bool = false, repeats: Bool = true) -> some View {
-        if active {
-            modifier(Shimmer(movement: movement, delay: delay, bounces: bounces, invertedMask: invertedMask, repeats: repeats))
-        } else {
-            self
+            if active, #available(iOS 14.0, *) {
+                modifier(Shimmer(movement: movement, delay: delay, bounces: bounces, invertedMask: invertedMask, repeats: repeats))
+            } else {
+                self
+            }
         }
-    }
 }
 
 extension Shimmer.GradientMask {
@@ -148,13 +148,13 @@ public extension Shimmer {
 }
 
 public extension Shimmer.AnimationMovement {
-
+    
     func duration(with contentSize: CGSize) -> Double {
-
+        
         switch self {
-
+            
         case .constantDuration(let dur): return dur
-
+            
         case .constantVelocity(let vel):
             let screenWidth = UIScreen.main.bounds.size.width
             let contentWidth = contentSize.width

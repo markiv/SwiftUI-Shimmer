@@ -6,8 +6,7 @@
 
 import SwiftUI
 
-//let centerColor = Color.white.opacity(0.3)
-//let edgeColor = Color.white.opacity(1)
+public typealias ShimmerCompletion = (() -> ())
 
 /// A view modifier that applies an animated "shimmer" to any view, typically to show that
 /// an operation is in progress.
@@ -20,14 +19,16 @@ public struct Shimmer: ViewModifier {
     var bounces: Bool
     let invertedMask: Bool
     var repeats: Bool
+    var completion: ShimmerCompletion?
     
-    public init(movement: AnimationMovement = .constantDuration(1.5), delay: Double = 0, bounces: Bool = false, invertedMask: Bool = false, repeats: Bool = true) {
+    public init(movement: AnimationMovement = .constantDuration(1.5), delay: Double = 0, bounces: Bool = false, invertedMask: Bool = false, repeats: Bool = true, completion: ShimmerCompletion? = nil) {
         
         self.movement = movement
         self.delay = delay
         self.bounces = bounces
         self.invertedMask = invertedMask
         self.repeats = repeats
+        self.completion = completion
     }
     
     public func body(content: Content) -> some View {
@@ -44,6 +45,11 @@ public struct Shimmer: ViewModifier {
                         .fill(.clear)
                         .preference(key: ContentSizeSetterPreferenceKey.self, value: [ContentSizeSetterPreferenceData(size: geoProxy.size)])
                 }, alignment: .center)
+                .onAnimationCompleted(for: phase) {
+                    
+                    guard !repeats else { return }
+                    completion?()
+                }
         }
         .onPreferenceChange(ContentSizeSetterPreferenceKey.self, perform: { prefs in
             
@@ -111,7 +117,8 @@ public extension View {
     ///   - duration: The duration of a shimmer cycle in seconds. Default: `1.5`.
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
     @ViewBuilder func shimmering(
-        active: Bool = true, movement: Shimmer.AnimationMovement = .constantDuration(1.5), delay: Double = 0, bounces: Bool = false, invertedMask: Bool = false, repeats: Bool = true) -> some View {
+        active: Bool = true, movement: Shimmer.AnimationMovement = .constantDuration(1.5), delay: Double = 0, bounces: Bool = false, invertedMask: Bool = false, repeats: Bool = true, completion: ShimmerCompletion? = nil) -> some View {
+            
             if active, #available(iOS 14.0, *) {
                 modifier(Shimmer(movement: movement, delay: delay, bounces: bounces, invertedMask: invertedMask, repeats: repeats))
             } else {

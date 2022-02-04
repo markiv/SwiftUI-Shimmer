@@ -40,6 +40,27 @@ public struct Shimmer: ViewModifier {
     /// A slanted, animatable gradient between transparent and opaque to use as mask.
     /// The `phase` parameter shifts the gradient, moving the opaque band.
     struct GradientMask: View {
+
+        @Environment(\.layoutDirection) private var layoutDirection
+
+        private var startPoint: UnitPoint {
+            switch layoutDirection {
+            case .rightToLeft: return .topTrailing
+            case .leftToRight: return .topLeading
+            @unknown default: return .topLeading
+            }
+        }
+
+        private var endPoint: UnitPoint {
+            switch layoutDirection {
+            case .rightToLeft: return .bottomLeading
+            case .leftToRight: return .bottomTrailing
+            @unknown default: return .bottomTrailing
+            }
+        }
+
+        // MARK: - Implementation
+
         let phase: CGFloat
         let centerColor = Color.black
         let edgeColor = Color.black.opacity(0.3)
@@ -50,7 +71,7 @@ public struct Shimmer: ViewModifier {
                     .init(color: edgeColor, location: phase),
                     .init(color: centerColor, location: phase + 0.1),
                     .init(color: edgeColor, location: phase + 0.2)
-                ]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                ]), startPoint: startPoint, endPoint: endPoint)
         }
     }
 }

@@ -5,8 +5,8 @@
 ```swift
 import SwiftUI
 import Shimmer
-:
-:
+⋮
+⋮
 Text("SwiftUI Shimmer").modifier(Shimmer())
 ```
 or more conveniently
@@ -23,8 +23,21 @@ Text("SwiftUI Shimmer").shimmering()
 - `active`: Convenience parameter to conditionally enable the effect. Defaults to `true`.
 - `duration`: The duration of a shimmer cycle in seconds. Default: `1.5`.
 - `bounce`: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
+- `delay`: A delay in seconds. Defaults to `0`.
 
 ![Bounce 3](docs/bounce3.gif)
+
+## Custom Animation
+
+You can now provide a custom animation:
+
+```swift
+Text("Loading...")
+    .shimmering(
+        active: isAnimating,
+        animation: .easeInOut(duration: 2).repeatCount(5, autoreverses: false).delay(1)
+    )
+```
 
 ## Animated Skeletons ☠️
 

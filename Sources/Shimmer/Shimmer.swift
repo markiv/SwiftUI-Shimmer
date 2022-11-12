@@ -189,7 +189,7 @@ public extension View {
                     }
                     .frame(maxWidth: 200)
                     .shimmering(gradientMask: .init(
-                        inverse: false,
+                        inverse: true,
                         centerOpacity: 0.8,
                         edgeOpacity: 0.3,
                         startPoint: .topLeading,

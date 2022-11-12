@@ -20,33 +20,15 @@ public struct Shimmer: ViewModifier {
     private let gradientMask: GradientMask
     
     /// Initializes his modifier with a custom animation,
-    /// - Parameter animation: A custom animation. The default animation is
-    ///   `.linear(duration: 1.5).repeatForever(autoreverses: false)`.
+    /// - Parameters:
+    ///   - animation: Animation used to move the linear gradient.
+    ///   - gradientMask: `GradientMask` object used to define the linear gradient.
     init(
         animation: Animation,
         gradientMask: GradientMask
     ) {
         self.animation = animation
         self.gradientMask = gradientMask
-    }
-    
-    /// Convenience, backward-compatible initializer.
-    /// - Parameters:
-    ///   - duration: The duration of a shimmer cycle in seconds. Default: `1.5`.
-    ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
-    ///   - delay:A delay in seconds. Defaults to `0`.
-    init(
-        duration: Double,
-        bounce: Bool,
-        delay: Double,
-        gradientMask: GradientMask
-    ) {
-        self.init(
-            animation: .linear(duration: duration)
-                .repeatForever(autoreverses: bounce)
-                .delay(delay),
-            gradientMask: .init()
-        )
     }
 
     public func body(content: Content) -> some View {
@@ -132,34 +114,9 @@ public extension View {
     /// Adds an animated shimmering effect to any view, typically to show that
     /// an operation is in progress.
     /// - Parameters:
-    ///   - active: Convenience parameter to conditionally enable the effect. Defaults to `true`.
-    ///   - duration: The duration of a shimmer cycle in seconds. Default: `1.5`.
-    ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
-    ///   - delay:A delay in seconds. Defaults to `0`.
-    @ViewBuilder func shimmering(
-        active: Bool = true,
-        duration: Double = 1.5,
-        bounce: Bool = false,
-        delay: Double = 0,
-        gradientMask: Shimmer.GradientMask = .init()
-    ) -> some View {
-        if active {
-            modifier(Shimmer(
-                duration: duration,
-                bounce: bounce,
-                delay: delay,
-                gradientMask: gradientMask))
-        } else {
-            self
-        }
-    }
-
-    // Adds an animated shimmering effect to any view, typically to show that
-    /// an operation is in progress.
-    /// - Parameters:
-    ///   - active: Convenience parameter to conditionally enable the effect. Defaults to `true`.
-    ///   - animation: A custom animation. The default animation is
-    ///   `.linear(duration: 1.5).repeatForever(autoreverses: false)`.
+    ///   - active: Convenience parameter to conditionally enable the effect.
+    ///   - animation: Animation used to move the linear gradient.
+    ///   - gradientMask: `GradientMask` object used to define the linear gradient.
     @ViewBuilder
     func shimmering(
         active: Bool = true,
@@ -171,6 +128,29 @@ public extension View {
         } else {
             self
         }
+    }
+    
+    /// Adds an animated shimmering effect to any view, typically to show that
+    /// an operation is in progress.
+    /// - Parameters:
+    ///   - active: Convenience parameter to conditionally enable the effect.
+    ///   - duration: The duration of a shimmer cycle in seconds.
+    ///   - bounce: Whether to bounce (reverse) the animation back and forth.
+    ///   - delay:A delay in seconds.
+    ///   - gradientMask: `GradientMask` object used to define the linear gradient.
+    @ViewBuilder func shimmering(
+        active: Bool = true,
+        duration: Double = 1.5,
+        bounce: Bool = false,
+        delay: Double = 0,
+        gradientMask: Shimmer.GradientMask = .init()
+    ) -> some View {
+        self.shimmering(
+            active: active,
+            animation: .linear(duration: duration)
+                .repeatForever(autoreverses: bounce)
+                .delay(delay),
+            gradientMask: gradientMask)
     }
 }
 

@@ -9,40 +9,61 @@ import SwiftUI
 /// A view modifier that applies an animated "shimmer" to any view, typically to show that
 /// an operation is in progress.
 public struct Shimmer: ViewModifier {
-    let animation: Animation
-    @State private var phase: CGFloat = 0
+    
+    /// The default animation effect.
+    public static let defaultAnimation: Animation = .linear(duration: 1.5).repeatForever(autoreverses: false)
+    
+    @State
+    private var phase: CGFloat = 0
+    
+    private let animation: Animation
+    private let gradientMask: GradientMask
     
     /// Initializes his modifier with a custom animation,
     /// - Parameter animation: A custom animation. The default animation is
     ///   `.linear(duration: 1.5).repeatForever(autoreverses: false)`.
-    public init(animation: Animation = Self.defaultAnimation) {
+    init(
+        animation: Animation,
+        gradientMask: GradientMask
+    ) {
         self.animation = animation
+        self.gradientMask = gradientMask
     }
-
-    /// The default animation effect.
-    public static let defaultAnimation = Animation.linear(duration: 1.5).repeatForever(autoreverses: false)
-
+    
     /// Convenience, backward-compatible initializer.
     /// - Parameters:
     ///   - duration: The duration of a shimmer cycle in seconds. Default: `1.5`.
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
     ///   - delay:A delay in seconds. Defaults to `0`.
-    public init(duration: Double = 1.5, bounce: Bool = false, delay: Double = 0) {
-        self.animation = .linear(duration: duration)
-            .repeatForever(autoreverses: bounce)
-            .delay(delay)
+    init(
+        duration: Double,
+        bounce: Bool,
+        delay: Double,
+        gradientMask: GradientMask
+    ) {
+        self.init(
+            animation: .linear(duration: duration)
+                .repeatForever(autoreverses: bounce)
+                .delay(delay),
+            gradientMask: .init()
+        )
     }
 
     public func body(content: Content) -> some View {
         content
             .modifier(
-                AnimatedMask(phase: phase).animation(animation)
+                AnimatedMask(gradientMask: gradientMask, phase: phase)
+                    .animation(animation)
             )
-            .onAppear { phase = 0.8 }
+            .onAppear {
+                phase = 0.8
+            }
     }
 
     /// An animatable modifier to interpolate between `phase` values.
     struct AnimatedMask: AnimatableModifier {
+        
+        let gradientMask: GradientMask
         var phase: CGFloat = 0
 
         var animatableData: CGFloat {
@@ -52,24 +73,57 @@ public struct Shimmer: ViewModifier {
 
         func body(content: Content) -> some View {
             content
-                .mask(GradientMask(phase: phase).scaleEffect(3))
+                .mask(
+                    gradientMask
+                        .gradient(with: phase)
+                        .scaleEffect(3),
+                    inverse: gradientMask.inverse
+                )
         }
     }
-
-    /// A slanted, animatable gradient between transparent and opaque to use as mask.
-    /// The `phase` parameter shifts the gradient, moving the opaque band.
-    struct GradientMask: View {
-        let phase: CGFloat
-        let centerColor = Color.black
-        let edgeColor = Color.black.opacity(0.3)
-
-        var body: some View {
-            LinearGradient(gradient:
-                Gradient(stops: [
-                    .init(color: edgeColor, location: phase),
-                    .init(color: centerColor, location: phase + 0.1),
-                    .init(color: edgeColor, location: phase + 0.2),
-                ]), startPoint: .topLeading, endPoint: .bottomTrailing)
+    
+    /// Definition for an animatable gradient used as a mask
+    public struct GradientMask {
+        
+        /// Inverse the gradient mask
+        public let inverse: Bool
+        /// Opacity of the center gradient stop
+        public let centerOpacity: CGFloat
+        /// Opacity of the edge gradient stops
+        public let edgeOpacity: CGFloat
+        /// Start point of the linear gradient
+        public let startPoint: UnitPoint
+        /// End point of the linear gradient
+        public let endPoint: UnitPoint
+        /// Distance between linear gradient stops
+        public let width: CGFloat
+        
+        public init(
+            inverse: Bool = false,
+            centerOpacity: CGFloat = 1,
+            edgeOpacity: CGFloat = 0.3,
+            startPoint: UnitPoint = .topLeading,
+            endPoint: UnitPoint = .bottomTrailing,
+            width: CGFloat = 0.1
+        ) {
+            self.inverse = inverse
+            self.centerOpacity = centerOpacity
+            self.edgeOpacity = edgeOpacity
+            self.startPoint = startPoint
+            self.endPoint = endPoint
+            self.width = width
+        }
+        
+        func gradient(with phase: CGFloat) -> some View {
+            LinearGradient(
+                stops: [
+                    .init(color: .black.opacity(edgeOpacity), location: phase),
+                    .init(color: .black.opacity(centerOpacity), location: phase + width),
+                    .init(color: .black.opacity(edgeOpacity), location: phase + width * 2),
+                ],
+                startPoint: startPoint,
+                endPoint: endPoint
+            )
         }
     }
 }
@@ -83,10 +137,18 @@ public extension View {
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
     ///   - delay:A delay in seconds. Defaults to `0`.
     @ViewBuilder func shimmering(
-        active: Bool = true, duration: Double = 1.5, bounce: Bool = false, delay: Double = 0
+        active: Bool = true,
+        duration: Double = 1.5,
+        bounce: Bool = false,
+        delay: Double = 0,
+        gradientMask: Shimmer.GradientMask = .init()
     ) -> some View {
         if active {
-            modifier(Shimmer(duration: duration, bounce: bounce, delay: delay))
+            modifier(Shimmer(
+                duration: duration,
+                bounce: bounce,
+                delay: delay,
+                gradientMask: gradientMask))
         } else {
             self
         }
@@ -98,9 +160,14 @@ public extension View {
     ///   - active: Convenience parameter to conditionally enable the effect. Defaults to `true`.
     ///   - animation: A custom animation. The default animation is
     ///   `.linear(duration: 1.5).repeatForever(autoreverses: false)`.
-    @ViewBuilder func shimmering(active: Bool = true, animation: Animation = Shimmer.defaultAnimation) -> some View {
+    @ViewBuilder
+    func shimmering(
+        active: Bool = true,
+        animation: Animation = Shimmer.defaultAnimation,
+        gradientMask: Shimmer.GradientMask = .init()
+    ) -> some View {
         if active {
-            modifier(Shimmer(animation: animation))
+            modifier(Shimmer(animation: animation, gradientMask: gradientMask))
         } else {
             self
         }
@@ -112,18 +179,45 @@ public extension View {
         static var previews: some View {
             Group {
                 Text("SwiftUI Shimmer")
+                    .shimmering()
+                
+                Text("SwiftUI Shimmer")
+                    .shimmering(gradientMask: .init(
+                        inverse: false,
+                        centerOpacity: 1,
+                        edgeOpacity: 0.3,
+                        startPoint: .trailing,
+                        endPoint: .leading,
+                        width: 0.1))
+                    .preferredColorScheme(.light)
+                
+                Text("SwiftUI Shimmer")
+                    .shimmering(gradientMask: .init(
+                        inverse: false,
+                        centerOpacity: 1,
+                        edgeOpacity: 0.3,
+                        startPoint: .top,
+                        endPoint: .bottom,
+                        width: 0.1))
+                    .preferredColorScheme(.dark)
+                
                 if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
-                    Text("SwiftUI Shimmer").preferredColorScheme(.light)
-                    Text("SwiftUI Shimmer").preferredColorScheme(.dark)
                     VStack(alignment: .leading) {
                         Text("Loading...").font(.title)
                         Text(String(repeating: "Shimmer", count: 12))
                             .redacted(reason: .placeholder)
-                    }.frame(maxWidth: 200)
+                    }
+                    .frame(maxWidth: 200)
+                    .shimmering(gradientMask: .init(
+                        inverse: false,
+                        centerOpacity: 0.8,
+                        edgeOpacity: 0.3,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing,
+                        width: 0.2))
                 }
             }
             .padding()
-            .shimmering()
             .previewLayout(.sizeThatFits)
         }
     }

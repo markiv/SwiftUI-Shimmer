@@ -53,11 +53,17 @@ Text("Some text")
 
 ## Installation 
 
-SwiftUI-Shimmer can be installed using Swift Package Manager.
-
-Use the package URL to search for the URLImage package: [https://github.com/markiv/SwiftUI-Shimmer](https://github.com/markiv/SwiftUI-Shimmer).
+### Swift Package Manager
+Use the package URL or search for the SwiftUI-Shimmer package: [https://github.com/markiv/SwiftUI-Shimmer](https://github.com/markiv/SwiftUI-Shimmer).
 
 For how-to integrate package dependencies refer to [Adding Package Dependencies to Your App documentation](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
+
+### Cocoapods
+Add this to your Podfile:
+
+```ruby
+pod 'SwiftUI-Shimmer', :git => 'https://github.com/markiv/SwiftUI-Shimmer.git'
+```
 
 ## What About UIKit?
 

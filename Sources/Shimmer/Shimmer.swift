@@ -97,7 +97,7 @@ public extension View {
         }
     }
 
-    // Adds an animated shimmering effect to any view, typically to show that
+    /// Adds an animated shimmering effect to any view, typically to show that
     /// an operation is in progress.
     /// - Parameters:
     ///   - active: Convenience parameter to conditionally enable the effect. Defaults to `true`.
@@ -129,7 +129,6 @@ struct Shimmer_Previews: PreviewProvider {
         }
         .padding()
         .shimmering()
-        .environment(\.layoutDirection, .rightToLeft)
         .previewLayout(.sizeThatFits)
     }
 }

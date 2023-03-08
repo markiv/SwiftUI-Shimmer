@@ -51,7 +51,12 @@ Text("Some text")
     .shimmering()
 ```
 
-## Installation 
+## Right-To-Left (RTL) Support
+
+The mask and animation now adjusts automatically to the environment's `layoutDirection` in order to better support 
+different languages and locales.  
+
+## Installation
 
 ### Swift Package Manager
 Use the package URL or search for the SwiftUI-Shimmer package: [https://github.com/markiv/SwiftUI-Shimmer](https://github.com/markiv/SwiftUI-Shimmer).

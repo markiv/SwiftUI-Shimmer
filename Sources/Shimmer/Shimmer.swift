@@ -11,7 +11,7 @@ import SwiftUI
 public struct Shimmer: ViewModifier {
     let animation: Animation
     @State private var phase: CGFloat = 0
-    
+
     /// Initializes his modifier with a custom animation,
     /// - Parameter animation: A custom animation. The default animation is
     ///   `.linear(duration: 1.5).repeatForever(autoreverses: false)`.
@@ -62,14 +62,19 @@ public struct Shimmer: ViewModifier {
         let phase: CGFloat
         let centerColor = Color.black
         let edgeColor = Color.black.opacity(0.3)
+        @Environment(\.layoutDirection) private var layoutDirection
 
         var body: some View {
-            LinearGradient(gradient:
-                Gradient(stops: [
+            let isRightToLeft = layoutDirection == .rightToLeft
+            LinearGradient(
+                gradient: Gradient(stops: [
                     .init(color: edgeColor, location: phase),
                     .init(color: centerColor, location: phase + 0.1),
-                    .init(color: edgeColor, location: phase + 0.2),
-                ]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .init(color: edgeColor, location: phase + 0.2)
+                ]),
+                startPoint: isRightToLeft ? .bottomTrailing : .topLeading,
+                endPoint: isRightToLeft ? .topLeading : .bottomTrailing
+            )
         }
     }
 }
@@ -108,23 +113,24 @@ public extension View {
 }
 
 #if DEBUG
-    struct Shimmer_Previews: PreviewProvider {
-        static var previews: some View {
-            Group {
-                Text("SwiftUI Shimmer")
-                if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
-                    Text("SwiftUI Shimmer").preferredColorScheme(.light)
-                    Text("SwiftUI Shimmer").preferredColorScheme(.dark)
-                    VStack(alignment: .leading) {
-                        Text("Loading...").font(.title)
-                        Text(String(repeating: "Shimmer", count: 12))
-                            .redacted(reason: .placeholder)
-                    }.frame(maxWidth: 200)
-                }
+struct Shimmer_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            Text("SwiftUI Shimmer")
+            if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+                Text("SwiftUI Shimmer").preferredColorScheme(.light)
+                Text("SwiftUI Shimmer").preferredColorScheme(.dark)
+                VStack(alignment: .leading) {
+                    Text("Loading...").font(.title)
+                    Text(String(repeating: "Shimmer", count: 12))
+                        .redacted(reason: .placeholder)
+                }.frame(maxWidth: 200)
             }
-            .padding()
-            .shimmering()
-            .previewLayout(.sizeThatFits)
         }
+        .padding()
+        .shimmering()
+        .environment(\.layoutDirection, .rightToLeft)
+        .previewLayout(.sizeThatFits)
     }
+}
 #endif

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'SwiftUI-Shimmer'
-    s.version          = '1.2.0'
+    s.version          = '1.4.0'
     s.summary          = 'Shimmer is a super-light modifier that adds a shimmering effect to any SwiftUI View, for example, to show that an operation is in progress.'
     s.homepage         = 'https://github.com/markiv/SwiftUI-Shimmer'
     s.license          = { :type => 'MIT', :file => 'LICENSE' }

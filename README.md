@@ -1,6 +1,11 @@
 # SwiftUI-Shimmer ✨
 
-`Shimmer` is a super-light modifier that adds a shimmering effect to any SwiftUI `View`, for example, to show that an operation is in progress. It works well on light and dark modes, and across iOS, macOS, tvOS and watchOS.
+`Shimmer` is a super-light modifier that adds a "shimmering" effect to any SwiftUI `View`, for example, to show that an operation is in progress. It works well on light and dark modes, left-to-right and right-to-left layout directions, and across all Apple platforms: iOS, macOS, tvOS, watchOS and even visionOS! 📱💻🖥️📺⌚️🥽✨
+
+![visionOS](docs/Shimmer-visionOS.gif) ![watchOS](docs/Shimmer-watchOS.gif)
+
+
+## Usage
 
 ```swift
 import SwiftUI
@@ -21,15 +26,22 @@ Text("SwiftUI Shimmer").shimmering()
 ## Optional Parameters ⚙️
 
 - `active`: Convenience parameter to conditionally enable the effect. Defaults to `true`.
+- `animation`: A custom animation. Defaults to `Shimmer.defaultAnimation`.
+- `gradient`: A custom gradient. Defaults to `Shimmer.defaultGradient`.
+- `bandSize`: The size of the animated mask's "band". Defaults to 0.2 unit points, which corresponds to 20% of the extent of the gradient.
+
+### Backward Compatible Parameters
+
+- `active`: Convenience parameter to conditionally enable the effect. Defaults to `true`.
 - `duration`: The duration of a shimmer cycle in seconds. Default: `1.5`.
 - `bounce`: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
 - `delay`: A delay in seconds. Defaults to `0`.
 
 ![Bounce 3](docs/bounce3.gif)
 
-## Custom Animation
+## Custom Animations
 
-You can now provide a custom animation:
+You can supply any custom animation:
 
 ```swift
 Text("Loading...")

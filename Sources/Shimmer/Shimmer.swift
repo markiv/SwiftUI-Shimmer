@@ -18,12 +18,12 @@ public struct Shimmer: ViewModifier {
     /// - Parameters:
     ///   - animation: A custom animation. Defaults to ``Shimmer/defaultAnimation``.
     ///   - gradient: A custom gradient. Defaults to ``Shimmer/defaultGradient``.
-    ///   - bandSize: The size of the animated mask's "band". Defaults to 0.2 unit points, which corresponds to
-    /// 20% of the extent of the gradient.
+    ///   - bandSize: The size of the animated mask's "band". Defaults to 0.3 unit points, which corresponds to
+    /// 30% of the extent of the gradient.
     public init(
         animation: Animation = Self.defaultAnimation,
         gradient: Gradient = Self.defaultGradient,
-        bandSize: CGFloat = 0.2
+        bandSize: CGFloat = 0.3
     ) {
         self.animation = animation
         self.gradient = gradient
@@ -97,13 +97,13 @@ public extension View {
     ///   - active: Convenience parameter to conditionally enable the effect. Defaults to `true`.
     ///   - animation: A custom animation. Defaults to ``Shimmer/defaultAnimation``.
     ///   - gradient: A custom gradient. Defaults to ``Shimmer/defaultGradient``.
-    ///   - bandSize: The size of the animated mask's "band". Defaults to 0.2 unit points, which corresponds to
+    ///   - bandSize: The size of the animated mask's "band". Defaults to 0.3 unit points, which corresponds to
     /// 20% of the extent of the gradient.
     @ViewBuilder func shimmering(
         active: Bool = true,
         animation: Animation = Shimmer.defaultAnimation,
         gradient: Gradient = Shimmer.defaultGradient,
-        bandSize: CGFloat = 0.2
+        bandSize: CGFloat = 0.3
     ) -> some View {
         if active {
             modifier(Shimmer(animation: animation, gradient: gradient, bandSize: bandSize))
@@ -117,7 +117,7 @@ public extension View {
     ///   - active: Convenience parameter to conditionally enable the effect. Defaults to `true`.
     ///   - duration: The duration of a shimmer cycle in seconds.
     ///   - bounce: Whether to bounce (reverse) the animation back and forth. Defaults to `false`.
-    ///   - delay:A delay in seconds. Defaults to `0.25`.\
+    ///   - delay:A delay in seconds. Defaults to `0.25`.
     @available(*, deprecated, message: "Use shimmering(active:animation:gradient:bandSize:) instead.")
     @ViewBuilder func shimmering(
         active: Bool = true, duration: Double, bounce: Bool = false, delay: Double = 0.25

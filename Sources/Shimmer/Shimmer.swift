@@ -83,10 +83,9 @@ public struct Shimmer: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .mask(LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint))
+            .animation(animation, value: isInitialState)
             .onAppear {
-                withAnimation(animation) {
-                    isInitialState = false
-                }
+                isInitialState = false
             }
     }
 }

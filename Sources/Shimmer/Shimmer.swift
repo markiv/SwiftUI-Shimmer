@@ -8,6 +8,7 @@ import SwiftUI
 
 /// A view modifier that applies an animated "shimmer" to any view, typically to show that an operation is in progress.
 public struct Shimmer: ViewModifier {
+    private let isActive: Bool
     private let animation: Animation
     private let gradient: Gradient
     private let min, max: CGFloat
@@ -21,10 +22,12 @@ public struct Shimmer: ViewModifier {
     ///   - bandSize: The size of the animated mask's "band". Defaults to 0.3 unit points, which corresponds to
     /// 30% of the extent of the gradient.
     public init(
+        isActive: Bool,
         animation: Animation = Self.defaultAnimation,
         gradient: Gradient = Self.defaultGradient,
         bandSize: CGFloat = 0.3
     ) {
+        self.isActive = isActive
         self.animation = animation
         self.gradient = gradient
         // Calculate unit point dimensions beyond the gradient's edges by the band size
@@ -82,11 +85,37 @@ public struct Shimmer: ViewModifier {
 
     public func body(content: Content) -> some View {
         content
-            .mask(LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint))
-            .animation(animation, value: isInitialState)
+            .mask(
+                LinearGradient(
+                    gradient: isActive ? gradient : .transparent,
+                    startPoint: startPoint,
+                    endPoint: endPoint
+                )
+            )
+            .animation(
+                isActive ? animation : .linear(duration: 0), // FW: This is a correct way to stop animation. If using `isActive ? .linear(...) : .none` instead then the animation would be choppy. https://stackoverflow.com/questions/61830571/whats-causing-swiftui-nested-view-items-jumpy-animation-after-the-initial-drawi/61841018#61841018
+                value: isInitialState
+            )
             .onAppear {
-                isInitialState = false
+                if isActive {
+                    startShimmering()
+                }
             }
+            .valueChanged(value: isActive) { isActive in
+                if isActive {
+                    startShimmering()
+                } else {
+                    stopShimmering()
+                }
+            }
+    }
+    
+    private func startShimmering() {
+        isInitialState = false
+    }
+    
+    private func stopShimmering() {
+        isInitialState = true
     }
 }
 
@@ -104,11 +133,9 @@ public extension View {
         gradient: Gradient = Shimmer.defaultGradient,
         bandSize: CGFloat = 0.3
     ) -> some View {
-        if active {
-            modifier(Shimmer(animation: animation, gradient: gradient, bandSize: bandSize))
-        } else {
-            self
-        }
+        modifier(
+            Shimmer(isActive: active, animation: animation, gradient: gradient, bandSize: bandSize)
+        )
     }
 
     /// Adds an animated shimmering effect to any view, typically to show that an operation is in progress.
@@ -130,6 +157,32 @@ public extension View {
 
 #if DEBUG
 struct Shimmer_Previews: PreviewProvider {
+    struct TogglePreview: View {
+        @State private var isShimmeringActive = true
+        
+        var body: some View {
+            Form {
+                Toggle(isOn: $isShimmeringActive) {
+                    Text("Is shimmering active")
+                }
+                ViewWithItsOwnState()
+                    .shimmering(active: isShimmeringActive)
+            }
+        }
+        
+        struct ViewWithItsOwnState: View {
+            @State private var isOn: Bool = false
+            
+            var body: some View {
+                Toggle(isOn: $isOn) {
+                    Text("Should remain the same when toggle shimmering")
+                }
+                Text("SwiftUI Shimmer")
+                    .foregroundColor(.red)
+            }
+        }
+    }
+    
     static var previews: some View {
         Group {
             Text("SwiftUI Shimmer")
@@ -155,6 +208,9 @@ struct Shimmer_Previews: PreviewProvider {
         .font(.largeTitle)
         .shimmering()
         .environment(\.layoutDirection, .rightToLeft)
+        
+        TogglePreview()
+            .previewDisplayName("Shimmering toggle")
     }
 }
 #endif

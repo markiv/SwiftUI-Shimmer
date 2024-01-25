@@ -82,7 +82,6 @@ public struct Shimmer: ViewModifier {
 
     public func body(content: Content) -> some View {
         content
-            .animation(nil, value: false) // Prevent animation from propagating to the modified view
             .mask(LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint))
             .animation(animation, value: isInitialState)
             .onAppear {

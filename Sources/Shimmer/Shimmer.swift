@@ -8,9 +8,19 @@ import SwiftUI
 
 /// A view modifier that applies an animated "shimmer" to any view, typically to show that an operation is in progress.
 public struct Shimmer: ViewModifier {
+    public enum Mode {
+        /// Masks the content with the gradient (this is the usual, default mode).
+        case mask
+        /// Overlays the gradient with a given `BlendMode` (`.sourceAtop` by default).
+        case overlay(blendMode: BlendMode = .sourceAtop)
+        /// Places the gradient behind the content.
+        case background
+    }
+
     private let animation: Animation
     private let gradient: Gradient
     private let min, max: CGFloat
+    private let mode: Mode
     @State private var isInitialState = true
     @Environment(\.layoutDirection) private var layoutDirection
 
@@ -23,13 +33,15 @@ public struct Shimmer: ViewModifier {
     public init(
         animation: Animation = Self.defaultAnimation,
         gradient: Gradient = Self.defaultGradient,
-        bandSize: CGFloat = 0.3
+        bandSize: CGFloat = 0.3,
+        mode: Mode = .mask
     ) {
         self.animation = animation
         self.gradient = gradient
         // Calculate unit point dimensions beyond the gradient's edges by the band size
         self.min = 0 - bandSize
         self.max = 1 + bandSize
+        self.mode = mode
     }
 
     /// The default animation effect.
@@ -65,23 +77,23 @@ public struct Shimmer: ViewModifier {
     /// The start unit point of our gradient, adjusting for layout direction.
     var startPoint: UnitPoint {
         if layoutDirection == .rightToLeft {
-            return isInitialState ? UnitPoint(x: max, y: min) : UnitPoint(x: 0, y: 1)
+            isInitialState ? UnitPoint(x: max, y: min) : UnitPoint(x: 0, y: 1)
         } else {
-            return isInitialState ? UnitPoint(x: min, y: min) : UnitPoint(x: 1, y: 1)
+            isInitialState ? UnitPoint(x: min, y: min) : UnitPoint(x: 1, y: 1)
         }
     }
 
     /// The end unit point of our gradient, adjusting for layout direction.
     var endPoint: UnitPoint {
         if layoutDirection == .rightToLeft {
-            return isInitialState ? UnitPoint(x: 1, y: 0) : UnitPoint(x: min, y: max)
+            isInitialState ? UnitPoint(x: 1, y: 0) : UnitPoint(x: min, y: max)
         } else {
-            return isInitialState ? UnitPoint(x: 0, y: 0) : UnitPoint(x: max, y: max)
+            isInitialState ? UnitPoint(x: 0, y: 0) : UnitPoint(x: max, y: max)
         }
     }
 
     public func body(content: Content) -> some View {
-        content
+        applyingGradient(to: content)
             .mask(LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint))
             .animation(animation, value: isInitialState)
             .onAppear {
@@ -91,6 +103,18 @@ public struct Shimmer: ViewModifier {
                     isInitialState = false
                 }
             }
+    }
+
+    @ViewBuilder public func applyingGradient(to content: Content) -> some View {
+        let gradient = LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint)
+        switch mode {
+        case .mask:
+            content.mask(gradient)
+        case let .overlay(blendMode: blendMode):
+            content.overlay(gradient.blendMode(blendMode))
+        case .background:
+            content.background(gradient)
+        }
     }
 }
 
@@ -106,10 +130,11 @@ public extension View {
         active: Bool = true,
         animation: Animation = Shimmer.defaultAnimation,
         gradient: Gradient = Shimmer.defaultGradient,
-        bandSize: CGFloat = 0.3
+        bandSize: CGFloat = 0.3,
+        mode: Shimmer.Mode = .mask
     ) -> some View {
         if active {
-            modifier(Shimmer(animation: animation, gradient: gradient, bandSize: bandSize))
+            modifier(Shimmer(animation: animation, gradient: gradient, bandSize: bandSize, mode: mode))
         } else {
             self
         }
@@ -159,6 +184,14 @@ struct Shimmer_Previews: PreviewProvider {
         .font(.largeTitle)
         .shimmering()
         .environment(\.layoutDirection, .rightToLeft)
+
+        Text("Custom Gradient Mode").bold()
+            .font(.largeTitle)
+            .shimmering(
+                gradient: Gradient(colors: [.clear, .orange, .white, .green, .clear]),
+                bandSize: 0.5,
+                mode: .overlay()
+            )
     }
 }
 #endif

@@ -51,6 +51,22 @@ Text("Loading...")
     )
 ```
 
+## Gradient Mode
+
+In addition to the original masking mode (which is still the default), Shimmer now supports additional modes to apply the gradient, including as a background or an overlay with a custom blend mode:
+
+![Loading](docs/custom-gradient-mode.gif)
+
+```swift
+Text("Custom Gradient Mode").bold()
+    .font(.largeTitle)
+    .shimmering(
+        gradient: Gradient(colors: [.clear, .orange, .white, .green, .clear]),
+        bandSize: 0.5,
+        mode: .overlay()
+    )
+```
+
 ## Animated Skeletons ☠️
 
 Of course, you can combine `.shimmering(...)` with the `.redacted(...)` modifier to create interesting animated skeleton views.

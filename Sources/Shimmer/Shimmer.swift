@@ -110,7 +110,7 @@ public struct Shimmer: ViewModifier {
         case .mask:
             content.mask(gradient)
         case let .overlay(blendMode: blendMode):
-            content.overlay(gradient.blendMode(blendMode))
+            content.overlay(gradient.blendMode(blendMode)).mask(content)
         case .background:
             content.background(gradient)
         }
